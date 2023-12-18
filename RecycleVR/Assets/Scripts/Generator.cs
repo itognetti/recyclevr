@@ -7,6 +7,7 @@ public class Generator : MonoBehaviour
     public GameObject[] prefabs; // Array de prefabs a generar
     public Transform plataforma; // De donde salen
     public Vector2 spawnInterval = new Vector2(0.5f, 0.5f); // Intervalo de tiempo entre generaciones
+    public float destroyHeight = -2f; // Altura Y a la que se deben destruir los objetos
 
     private float nextSpawnTime;
 
@@ -22,6 +23,9 @@ public class Generator : MonoBehaviour
             GenerarPrefab();
             nextSpawnTime = Time.time + Random.Range(spawnInterval.x, spawnInterval.y);
         }
+
+        // Verificar y destruir objetos que han alcanzado la altura Y deseada
+        DestroyObjectsBelowHeight();
     }
 
     private void GenerarPrefab()
@@ -34,5 +38,21 @@ public class Generator : MonoBehaviour
 
         // Instancia el prefab en la posición generada
         Instantiate(prefab, spawnPosition, Quaternion.identity);
+    }
+
+    private void DestroyObjectsBelowHeight()
+    {
+        // Obtener todos los objetos con el componente Destroyable
+        Destroyable[] destroyableObjects = FindObjectsOfType<Destroyable>();
+
+        foreach (Destroyable destroyableObject in destroyableObjects)
+        {
+            // Verificar si el objeto está por debajo de la altura Y deseada
+            if (destroyableObject.transform.position.y <= destroyHeight)
+            {
+                // Destruir el objeto
+                Destroy(destroyableObject.gameObject);
+            }
+        }
     }
 }
